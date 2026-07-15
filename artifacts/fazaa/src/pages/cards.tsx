@@ -1,107 +1,130 @@
 import React, { useState } from 'react';
 import { Link, useSearch, useLocation } from 'wouter';
-import { ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Info } from 'lucide-react';
 
-import { BRANDS, type BrandKey, type CardData } from '@/data/brands';
+import { BRANDS, type BrandKey, type CardData, type BrandData } from '@/data/brands';
 
-function CardPlaceholder({ brand, card }: { brand: ReturnType<typeof import('@/data/brands')['BRANDS'][BrandKey]>; card: CardData }) {
+/* ─── CSS card visual for brands without a real image ─── */
+function CardVisual({ brand, card }: { brand: BrandData; card: CardData }) {
+  if (card.image) {
+    return (
+      <img
+        src={card.image}
+        alt={`بطاقة ${card.name} - مثال توضيحي`}
+        className="w-full h-44 object-cover rounded-xl"
+      />
+    );
+  }
   return (
     <div
-      className="w-[130px] h-[90px] rounded-lg flex flex-col items-center justify-center text-white shadow-sm shrink-0"
-      style={{ background: `linear-gradient(135deg, ${brand.darkColor}, ${brand.color})` }}
+      className="w-full h-44 rounded-xl flex flex-col justify-between p-5 select-none overflow-hidden relative"
+      style={{ background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)` }}
     >
-      <p className="text-xs font-bold font-sans opacity-80">{brand.nameEn}</p>
-      <p className="text-sm font-bold mt-0.5">{card.name}</p>
+      {/* decorative circle */}
+      <div className="absolute -left-8 -top-8 w-36 h-36 rounded-full opacity-10 bg-white" />
+      <div className="absolute -right-4 -bottom-6 w-28 h-28 rounded-full opacity-10 bg-white" />
+
+      <div className="flex justify-between items-start relative z-10">
+        {/* chip */}
+        <div className="w-9 h-7 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 opacity-90 grid grid-cols-2 gap-[2px] p-[3px]">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-yellow-700/40 rounded-[1px]" />
+          ))}
+        </div>
+        <span className="text-xs font-bold text-white/60 font-sans tracking-wider">{brand.nameEn}</span>
+      </div>
+
+      <div className="relative z-10">
+        <p className="text-white/50 text-xs font-sans tracking-widest mb-1.5">•••• •••• •••• ••••</p>
+        <p className="text-white font-bold text-lg leading-none">{card.name}</p>
+      </div>
     </div>
   );
 }
 
-function ExpandableCard({ brand, card }: { brand: ReturnType<typeof import('@/data/brands')['BRANDS'][BrandKey]>; card: CardData }) {
+/* ─── Individual membership card ─── */
+function MemberCard({ brand, card }: { brand: BrandData; card: CardData }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-white border border-[#e8e8e8] rounded-xl p-4 shadow-sm relative transition-all duration-300">
+    <div className="bg-white border border-[#e8e8e8] rounded-2xl shadow-sm overflow-hidden flex flex-col relative hover:shadow-md transition-shadow duration-200">
       {card.badge && (
-        <div className="absolute top-0 right-0 bg-[#e63946] text-white text-xs font-bold px-4 py-1.5 rounded-tr-xl rounded-bl-lg z-10 shadow-sm">
+        <div className="absolute top-3 left-3 z-10 bg-[#e63946] text-white text-xs font-bold px-3 py-1 rounded-full shadow">
           {card.badge}
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-2 sm:mt-0">
-        {/* Right side: Image + Text */}
-        <div className="flex items-center gap-4 flex-1 w-full">
-          <div className="w-[130px] h-[90px] shrink-0 rounded-lg overflow-hidden shadow-sm border border-gray-100">
-            {card.image ? (
-              <img src={card.image} alt={card.name} className="w-full h-full object-cover" />
-            ) : (
-              <CardPlaceholder brand={brand} card={card} />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className={`text-xl font-bold mb-1 ${card.nameColor}`}>{card.name}</h3>
-            <p className="text-gray-600 text-sm md:text-base">{card.description}</p>
-            <p className="text-[#c9a227] font-bold text-sm mt-1">{card.price}</p>
-          </div>
-        </div>
-
-        {/* Left side: Buttons */}
-        <div className="flex flex-row sm:flex-col items-center justify-end w-full sm:w-auto gap-3 sm:gap-2 mt-2 sm:mt-0 shrink-0">
-          <Link
-            href={`/order?brand=${brand.key}&type=${card.id}`}
-            data-testid={`btn-order-${card.id}`}
-            className="bg-[#c9a227] hover:bg-[#b8943f] text-white font-medium py-2 px-6 rounded-lg transition-colors whitespace-nowrap shadow-sm text-center flex-1 sm:flex-none cursor-pointer"
-          >
-            أطلب الان
-          </Link>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            data-testid={`btn-expand-${card.id}`}
-            className="text-[#c9a227] hover:text-[#b8943f] text-sm font-medium flex items-center justify-center gap-1 transition-colors underline-offset-4 hover:underline py-2 sm:py-0 flex-1 sm:flex-none cursor-pointer"
-          >
-            <span>عرض المزيد</span>
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-        </div>
+      {/* Card visual */}
+      <div className="p-4 pb-0">
+        <CardVisual brand={brand} card={card} />
       </div>
 
-      {/* Benefits */}
-      <div className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] mt-4 opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-        <div className="overflow-hidden">
-          <div className="pt-4 border-t border-gray-100">
-            <h4 className="text-sm font-bold text-gray-800 mb-3">المزايا المشمولة:</h4>
-            <div className="flex flex-wrap gap-2">
-              {card.benefits.map((benefit, i) => (
-                <span key={i} className="bg-[#f5f5f5] text-gray-700 text-xs px-3 py-1.5 rounded-full border border-gray-200">
-                  {benefit}
+      {/* Content */}
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className={`text-xl font-bold mb-1 ${card.nameColor}`}>{card.name}</h3>
+        <p className="text-gray-500 text-sm mb-2">{card.description}</p>
+        <p className="text-[#c9a227] font-bold text-base mb-4">{card.price}</p>
+
+        {/* Expand benefits */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-[#c9a227] hover:text-[#b8943f] text-sm font-medium flex items-center gap-1 mb-4 transition-colors cursor-pointer self-start"
+        >
+          {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          <span>عرض المزيد</span>
+        </button>
+
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${
+            expanded ? 'grid-rows-[1fr] mb-4 opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="flex flex-wrap gap-1.5 pb-1">
+              {card.benefits.map((b, i) => (
+                <span
+                  key={i}
+                  className="bg-[#f5f5f5] text-gray-600 text-xs px-2.5 py-1 rounded-full border border-gray-200"
+                >
+                  {b}
                 </span>
               ))}
             </div>
           </div>
         </div>
+
+        {/* CTA */}
+        <div className="mt-auto">
+          <Link
+            href={`/register?brand=${brand.key}&type=${card.id}`}
+            className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
+          >
+            اطلب الآن
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
 
+/* ─── Page ─── */
 export default function Cards() {
   const search = useSearch();
   const [, setLocation] = useLocation();
   const params = new URLSearchParams(search);
   const brandKey = (params.get('brand') || 'fazaa') as BrandKey;
-
   const brand = BRANDS[brandKey] || BRANDS.fazaa;
 
   return (
     <div className="w-full">
-      {/* Brand Hero Banner */}
+      {/* Brand header */}
       <div
         className="w-full py-8 px-4"
         style={{ background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)` }}
       >
-        <div className="max-w-[750px] mx-auto flex items-center justify-between">
+        <div className="max-w-[900px] mx-auto flex items-center justify-between">
           <button
             onClick={() => setLocation('/')}
-            data-testid="btn-back-home"
             className="text-white/80 hover:text-white flex items-center gap-1 text-sm transition-colors cursor-pointer"
           >
             <ChevronRight size={18} className="rotate-180" />
@@ -109,7 +132,7 @@ export default function Cards() {
           </button>
           <div className="text-right">
             <h1 className="text-2xl md:text-3xl font-bold text-white">{brand.name}</h1>
-            <p className="text-white/80 text-sm font-sans mt-0.5">{brand.nameEn}</p>
+            <p className="text-white/70 text-sm font-sans mt-0.5">{brand.nameEn}</p>
           </div>
           <div
             className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg border-2 border-white/30"
@@ -118,27 +141,33 @@ export default function Cards() {
             {brand.nameEn.slice(0, 2)}
           </div>
         </div>
-
-        <div className="max-w-[750px] mx-auto mt-4">
-          <p className="text-white/80 text-sm text-right">{brand.description}</p>
-          <div className="flex flex-wrap gap-2 justify-end mt-2">
-            {brand.eligibility.map((item, i) => (
-              <span key={i} className="text-xs px-3 py-1 rounded-full bg-white/20 text-white border border-white/30">
-                {item}
-              </span>
-            ))}
-          </div>
+        <div className="max-w-[900px] mx-auto mt-3 flex flex-wrap gap-2 justify-end">
+          {brand.eligibility.map((item, i) => (
+            <span key={i} className="text-xs px-3 py-1 rounded-full bg-white/20 text-white border border-white/30">
+              {item}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* Cards Section */}
-      <div className="max-w-[750px] mx-auto px-4 md:px-6 py-10">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2 text-right">مزايا العضوية</h2>
-        <p className="text-gray-500 text-right text-sm mb-6">اختر النوع الذي يناسبك وابدأ الاستمتاع بالمزايا</p>
+      {/* Disclaimer */}
+      <div className="max-w-[900px] mx-auto px-4 pt-6">
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-right">
+          <p className="text-amber-800 text-xs leading-relaxed flex-1">
+            هذا الموقع <strong>ليس الموقع الرسمي</strong> لأي من الجهات المذكورة. الصور المعروضة هي أمثلة توضيحية فقط ولا تمثل بطاقات رسمية صادرة عن أي جهة حكومية أو خاصة.
+          </p>
+          <Info size={16} className="text-amber-500 shrink-0 mt-0.5" />
+        </div>
+      </div>
 
-        <div className="flex flex-col gap-4">
+      {/* Cards grid */}
+      <div className="max-w-[900px] mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-1 text-right">اختر نوع بطاقتك</h2>
+        <p className="text-gray-500 text-sm text-right mb-7">اضغط على «اطلب الآن» للمتابعة</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {brand.cards.map(card => (
-            <ExpandableCard key={card.id} brand={brand} card={card} />
+            <MemberCard key={card.id} brand={brand} card={card} />
           ))}
         </div>
       </div>

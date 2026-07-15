@@ -21,6 +21,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/cards" component={Cards} />
           <Route path="/order" component={Order} />
+          <Route path="/register" component={Order} />
           <Route>
             <div className="p-12 text-center text-xl">الصفحة غير موجودة 404</div>
           </Route>
