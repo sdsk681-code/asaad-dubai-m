@@ -1,107 +1,152 @@
 import React, { useState } from 'react';
 import { Link, useSearch, useLocation } from 'wouter';
-import { ChevronDown, ChevronUp, ChevronRight, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, Star, Award, Tag, Gem, Users, Building2, Shield, IdCard, Briefcase } from 'lucide-react';
 
 import { BRANDS, type BrandKey, type CardData, type BrandData } from '@/data/brands';
 
-/* ─── CSS card visual for brands without a real image ─── */
-function CardVisual({ brand, card }: { brand: BrandData; card: CardData }) {
-  if (card.image) {
-    return (
-      <img
-        src={card.image}
-        alt={`بطاقة ${card.name} - مثال توضيحي`}
-        className="w-full h-44 object-cover rounded-xl"
-      />
-    );
-  }
+/* ─── Icon per card type ─── */
+const CARD_ICONS: Record<string, React.ReactNode> = {
+  platinum: <Gem size={28} strokeWidth={1.5} />,
+  gold:     <Star size={28} strokeWidth={1.5} />,
+  silver:   <Award size={28} strokeWidth={1.5} />,
+  discount: <Tag size={28} strokeWidth={1.5} />,
+};
+
+/* ─── Credit-card style placeholder for brands without real images ─── */
+function CssCard({ brand, card }: { brand: BrandData; card: CardData }) {
   return (
     <div
-      className="w-full h-44 rounded-xl flex flex-col justify-between p-5 select-none overflow-hidden relative"
-      style={{ background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)` }}
+      className="w-full rounded-xl overflow-hidden relative select-none"
+      style={{
+        aspectRatio: '85/54',
+        background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)`,
+      }}
     >
-      {/* decorative circle */}
-      <div className="absolute -left-8 -top-8 w-36 h-36 rounded-full opacity-10 bg-white" />
-      <div className="absolute -right-4 -bottom-6 w-28 h-28 rounded-full opacity-10 bg-white" />
+      {/* decorative circles */}
+      <div className="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
+      <div className="absolute -right-6 -bottom-10 w-36 h-36 rounded-full bg-white/10" />
 
-      <div className="flex justify-between items-start relative z-10">
-        {/* chip */}
-        <div className="w-9 h-7 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 opacity-90 grid grid-cols-2 gap-[2px] p-[3px]">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-yellow-700/40 rounded-[1px]" />
-          ))}
+      <div className="absolute inset-0 p-4 flex flex-col justify-between">
+        {/* top row */}
+        <div className="flex justify-between items-start">
+          {/* SIM chip */}
+          <div className="w-8 h-6 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 grid grid-cols-2 gap-[2px] p-[3px]">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-yellow-700/40 rounded-[1px]" />
+            ))}
+          </div>
+          <span className="text-white/60 text-[10px] font-bold font-sans tracking-widest">{brand.nameEn}</span>
         </div>
-        <span className="text-xs font-bold text-white/60 font-sans tracking-wider">{brand.nameEn}</span>
-      </div>
 
-      <div className="relative z-10">
-        <p className="text-white/50 text-xs font-sans tracking-widest mb-1.5">•••• •••• •••• ••••</p>
-        <p className="text-white font-bold text-lg leading-none">{card.name}</p>
+        {/* bottom row */}
+        <div>
+          <p className="text-white/40 text-[9px] font-sans tracking-[.18em] mb-1">•••• •••• •••• ••••</p>
+          <div className="flex justify-between items-end">
+            <p className="text-white font-bold text-base leading-none">{card.name}</p>
+            {/* contactless icon */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/50">
+              <path d="M5 12.5C5 8.91 7.91 6 11.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M2 12.5C2 7.25 6.25 3 11.5 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M8 12.5C8 10.57 9.57 9 11.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="11.5" cy="12.5" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─── Individual membership card ─── */
+/* ─── Card image (real or CSS) ─── */
+function CardImage({ brand, card }: { brand: BrandData; card: CardData }) {
+  if (card.image) {
+    return (
+      <img
+        src={card.image}
+        alt={`${card.name} - مثال توضيحي`}
+        className="w-full rounded-xl object-cover"
+        style={{ aspectRatio: '85/54' }}
+      />
+    );
+  }
+  return <CssCard brand={brand} card={card} />;
+}
+
+/* ─── Single membership card — matches reference image layout ─── */
 function MemberCard({ brand, card }: { brand: BrandData; card: CardData }) {
   const [expanded, setExpanded] = useState(false);
+  // show first 3 benefits as checkmarks by default
+  const visibleBenefits = card.benefits.slice(0, 3);
+  const extraBenefits = card.benefits.slice(3);
 
   return (
-    <div className="bg-white border border-[#e8e8e8] rounded-2xl shadow-sm overflow-hidden flex flex-col relative hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow duration-200 relative">
+      {/* "Most popular" badge */}
       {card.badge && (
-        <div className="absolute top-3 left-3 z-10 bg-[#e63946] text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+        <div className="absolute top-3 left-3 z-10 bg-[#e63946] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow">
           {card.badge}
         </div>
       )}
 
-      {/* Card visual */}
-      <div className="p-4 pb-0">
-        <CardVisual brand={brand} card={card} />
-      </div>
+      <div className="p-4 flex flex-col h-full">
+        {/* ── Title row (top) ── */}
+        <div className="text-right mb-3">
+          <h3 className="text-[17px] font-bold text-gray-900 leading-snug">
+            بطاقة {card.name}
+          </h3>
+          <p className="text-gray-400 text-[12px] font-sans mt-0.5">
+            ({card.id === 'gold' ? 'Gold' : card.id === 'silver' ? 'Silver' : card.id === 'platinum' ? 'Platinum' : 'Discount'})
+          </p>
+        </div>
 
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className={`text-xl font-bold mb-1 ${card.nameColor}`}>{card.name}</h3>
-        <p className="text-gray-500 text-sm mb-2">{card.description}</p>
-        <p className="text-[#c9a227] font-bold text-base mb-4">{card.price}</p>
+        {/* ── Card Image (middle) ── */}
+        <div className="mb-4">
+          <CardImage brand={brand} card={card} />
+        </div>
 
-        {/* Expand benefits */}
+        {/* ── Checklist ── */}
+        <div className="flex-1 mb-3">
+          <ul className="space-y-1.5 text-right">
+            <li className="text-gray-600 text-sm font-medium">{card.description}</li>
+            {visibleBenefits.map((b, i) => (
+              <li key={i} className="flex items-center justify-end gap-2 text-[13px] text-gray-700">
+                <span>{b}</span>
+                <span className="text-green-500 font-bold text-base leading-none shrink-0">✓</span>
+              </li>
+            ))}
+            {/* extra benefits revealed on expand */}
+            {expanded && extraBenefits.map((b, i) => (
+              <li key={i} className="flex items-center justify-end gap-2 text-[13px] text-gray-700">
+                <span>{b}</span>
+                <span className="text-green-500 font-bold text-base leading-none shrink-0">✓</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ── Bottom row: icon + price ── */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[#c9a227] font-bold text-sm">{card.price}</span>
+          <div className="text-gray-300">
+            {CARD_ICONS[card.id]}
+          </div>
+        </div>
+
+        {/* ── Actions ── */}
+        <Link
+          href={`/register?brand=${brand.key}&type=${card.id}`}
+          className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm text-[15px] mb-2"
+        >
+          اطلب الآن
+        </Link>
+
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-[#c9a227] hover:text-[#b8943f] text-sm font-medium flex items-center gap-1 mb-4 transition-colors cursor-pointer self-start"
+          className="w-full flex items-center justify-center gap-1 text-[#c9a227] hover:text-[#b8943f] text-sm font-medium transition-colors cursor-pointer py-1"
         >
           {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           <span>عرض المزيد</span>
         </button>
-
-        <div
-          className={`grid transition-all duration-300 ease-in-out ${
-            expanded ? 'grid-rows-[1fr] mb-4 opacity-100' : 'grid-rows-[0fr] opacity-0'
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="flex flex-wrap gap-1.5 pb-1">
-              {card.benefits.map((b, i) => (
-                <span
-                  key={i}
-                  className="bg-[#f5f5f5] text-gray-600 text-xs px-2.5 py-1 rounded-full border border-gray-200"
-                >
-                  {b}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-auto">
-          <Link
-            href={`/register?brand=${brand.key}&type=${card.id}`}
-            className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
-          >
-            اطلب الآن
-          </Link>
-        </div>
       </div>
     </div>
   );
@@ -117,12 +162,12 @@ export default function Cards() {
 
   return (
     <div className="w-full">
-      {/* Brand header */}
+      {/* ── Brand header banner ── */}
       <div
-        className="w-full py-8 px-4"
+        className="w-full py-6 px-4"
         style={{ background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)` }}
       >
-        <div className="max-w-[900px] mx-auto flex items-center justify-between">
+        <div className="max-w-[960px] mx-auto flex items-center justify-between">
           <button
             onClick={() => setLocation('/')}
             className="text-white/80 hover:text-white flex items-center gap-1 text-sm transition-colors cursor-pointer"
@@ -130,46 +175,76 @@ export default function Cards() {
             <ChevronRight size={18} className="rotate-180" />
             العودة
           </button>
-          <div className="text-right">
-            <h1 className="text-2xl md:text-3xl font-bold text-white">{brand.name}</h1>
-            <p className="text-white/70 text-sm font-sans mt-0.5">{brand.nameEn}</p>
+          <div className="text-center">
+            <h1 className="text-2xl md:text-3xl font-bold text-white">بطاقات {brand.name}</h1>
+            <p className="text-white/70 text-xs font-sans mt-0.5">({brand.nameEn})</p>
           </div>
-          <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg border-2 border-white/30"
-            style={{ background: 'rgba(255,255,255,0.15)' }}
-          >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-base border-2 border-white/30 bg-white/15">
             {brand.nameEn.slice(0, 2)}
           </div>
         </div>
-        <div className="max-w-[900px] mx-auto mt-3 flex flex-wrap gap-2 justify-end">
+
+        {/* eligibility tags */}
+        <div className="max-w-[960px] mx-auto mt-3 flex flex-wrap gap-2 justify-center">
+          <span className="text-white/70 text-xs ml-1">{brand.description} •</span>
           {brand.eligibility.map((item, i) => (
-            <span key={i} className="text-xs px-3 py-1 rounded-full bg-white/20 text-white border border-white/30">
+            <span key={i} className="text-xs px-3 py-0.5 rounded-full bg-white/20 text-white border border-white/30">
               {item}
             </span>
           ))}
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div className="max-w-[900px] mx-auto px-4 pt-6">
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-right">
-          <p className="text-amber-800 text-xs leading-relaxed flex-1">
-            هذا الموقع <strong>ليس الموقع الرسمي</strong> لأي من الجهات المذكورة. الصور المعروضة هي أمثلة توضيحية فقط ولا تمثل بطاقات رسمية صادرة عن أي جهة حكومية أو خاصة.
-          </p>
-          <Info size={16} className="text-amber-500 shrink-0 mt-0.5" />
-        </div>
+      {/* ── Disclaimer ── */}
+      <div className="max-w-[960px] mx-auto px-4 pt-5">
+        <p className="text-[11px] text-gray-400 text-center border border-gray-200 rounded-lg px-4 py-2 bg-gray-50">
+          ⚠️ هذا الموقع <strong>ليس الموقع الرسمي</strong> لأي جهة. الصور أمثلة توضيحية فقط ولا تمثل بطاقات رسمية.
+        </p>
       </div>
 
-      {/* Cards grid */}
-      <div className="max-w-[900px] mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-1 text-right">اختر نوع بطاقتك</h2>
-        <p className="text-gray-500 text-sm text-right mb-7">اضغط على «اطلب الآن» للمتابعة</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* ── Cards grid ── */}
+      <div className="max-w-[960px] mx-auto px-4 py-7">
+        <div
+          className={`grid gap-5 ${
+            brand.cards.length === 3
+              ? 'grid-cols-1 sm:grid-cols-3'
+              : brand.cards.length === 4
+              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+          }`}
+        >
           {brand.cards.map(card => (
             <MemberCard key={card.id} brand={brand} card={card} />
           ))}
         </div>
+      </div>
+
+      {/* ── Bottom features bar (matches reference image) ── */}
+      <div className="bg-white border-t border-gray-100 py-6 px-4">
+        <div className="max-w-[960px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-5 text-center">
+          {[
+            { icon: '🏷️', title: 'خصومات حصرية', sub: 'على مئات الخدمات' },
+            { icon: '✅', title: 'سهولة الاستخدام', sub: 'في كل مكان' },
+            { icon: '⭐', title: 'معتمدة وموثوقة', sub: 'من الجهات الرسمية' },
+            { icon: '🤝', title: 'مزايا متعددة', sub: 'تناسب احتياجاتك' },
+          ].map((f, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <span className="text-2xl">{f.icon}</span>
+              <p className="font-bold text-gray-800 text-sm">{f.title}</p>
+              <p className="text-gray-500 text-xs">{f.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── CTA footer bar (matches reference image) ── */}
+      <div
+        className="py-4 px-4 text-center"
+        style={{ background: `linear-gradient(90deg, ${brand.darkColor}, ${brand.color})` }}
+      >
+        <p className="text-white font-bold text-base">
+          احصل على بطاقتك الآن وابدأ الاستفادة!
+        </p>
       </div>
     </div>
   );
