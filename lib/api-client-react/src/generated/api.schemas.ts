@@ -24,7 +24,6 @@ export type RegistrationInputCardType = typeof RegistrationInputCardType[keyof t
 
 
 export const RegistrationInputCardType = {
-  platinum: 'platinum',
   gold: 'gold',
   silver: 'silver',
   discount: 'discount',

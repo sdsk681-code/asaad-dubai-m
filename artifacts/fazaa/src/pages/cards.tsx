@@ -1,87 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useSearch, useLocation } from 'wouter';
-import { ChevronDown, ChevronUp, ChevronRight, Star, Award, Tag, Gem, Users, Building2, Shield, IdCard, Briefcase } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 
 import { BRANDS, type BrandKey, type CardData, type BrandData } from '@/data/brands';
 
-/* ─── Icon per card type ─── */
-const CARD_ICONS: Record<string, React.ReactNode> = {
-  platinum: <Gem size={28} strokeWidth={1.5} />,
-  gold:     <Star size={28} strokeWidth={1.5} />,
-  silver:   <Award size={28} strokeWidth={1.5} />,
-  discount: <Tag size={28} strokeWidth={1.5} />,
-};
-
-/* ─── Credit-card style placeholder for brands without real images ─── */
-function CssCard({ brand, card }: { brand: BrandData; card: CardData }) {
-  return (
-    <div
-      className="w-full rounded-xl overflow-hidden relative select-none"
-      style={{
-        aspectRatio: '85/54',
-        background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)`,
-      }}
-    >
-      {/* decorative circles */}
-      <div className="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
-      <div className="absolute -right-6 -bottom-10 w-36 h-36 rounded-full bg-white/10" />
-
-      <div className="absolute inset-0 p-4 flex flex-col justify-between">
-        {/* top row */}
-        <div className="flex justify-between items-start">
-          {/* SIM chip */}
-          <div className="w-8 h-6 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 grid grid-cols-2 gap-[2px] p-[3px]">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-yellow-700/40 rounded-[1px]" />
-            ))}
-          </div>
-          <span className="text-white/60 text-[10px] font-bold font-sans tracking-widest">{brand.nameEn}</span>
-        </div>
-
-        {/* bottom row */}
-        <div>
-          <p className="text-white/40 text-[9px] font-sans tracking-[.18em] mb-1">•••• •••• •••• ••••</p>
-          <div className="flex justify-between items-end">
-            <p className="text-white font-bold text-base leading-none">{card.name}</p>
-            {/* contactless icon */}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/50">
-              <path d="M5 12.5C5 8.91 7.91 6 11.5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M2 12.5C2 7.25 6.25 3 11.5 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M8 12.5C8 10.57 9.57 9 11.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="11.5" cy="12.5" r="1.5" fill="currentColor"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Card image (real or CSS) ─── */
-function CardImage({ brand, card }: { brand: BrandData; card: CardData }) {
-  if (card.image) {
-    return (
-      <img
-        src={card.image}
-        alt={`${card.name} - مثال توضيحي`}
-        className="w-full rounded-xl object-cover"
-        style={{ aspectRatio: '85/54' }}
-      />
-    );
-  }
-  return <CssCard brand={brand} card={card} />;
-}
-
-/* ─── Single membership card — matches reference image layout ─── */
+/* ─── Single card — anatomy: image → name → description → order button → more link ─── */
 function MemberCard({ brand, card }: { brand: BrandData; card: CardData }) {
   const [expanded, setExpanded] = useState(false);
-  // show first 3 benefits as checkmarks by default
-  const visibleBenefits = card.benefits.slice(0, 3);
-  const extraBenefits = card.benefits.slice(3);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow duration-200 relative">
-      {/* "Most popular" badge */}
+      {/* badge */}
       {card.badge && (
         <div className="absolute top-3 left-3 z-10 bg-[#e63946] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow">
           {card.badge}
@@ -89,64 +18,58 @@ function MemberCard({ brand, card }: { brand: BrandData; card: CardData }) {
       )}
 
       <div className="p-4 flex flex-col h-full">
-        {/* ── Title row (top) ── */}
-        <div className="text-right mb-3">
-          <h3 className="text-[17px] font-bold text-gray-900 leading-snug">
-            بطاقة {card.name}
-          </h3>
-          <p className="text-gray-400 text-[12px] font-sans mt-0.5">
-            ({card.id === 'gold' ? 'Gold' : card.id === 'silver' ? 'Silver' : card.id === 'platinum' ? 'Platinum' : 'Discount'})
-          </p>
+        {/* 1 ── card image (top) */}
+        <img
+          src={card.image}
+          alt={`${card.displayName} - مثال توضيحي`}
+          className="w-full rounded-xl object-cover mb-4"
+          style={{ aspectRatio: '85/54' }}
+          loading="lazy"
+        />
+
+        {/* 2 ── category name (middle) */}
+        <div className="text-center mb-1">
+          <h3 className="text-lg font-bold text-gray-900">{card.displayName}</h3>
+          <p className="text-gray-400 text-xs font-sans">({card.nameEn})</p>
         </div>
 
-        {/* ── Card Image (middle) ── */}
-        <div className="mb-4">
-          <CardImage brand={brand} card={card} />
-        </div>
+        {/* 3 ── short description */}
+        <p className="text-gray-600 text-sm text-center mb-2">{card.description}</p>
 
-        {/* ── Checklist ── */}
-        <div className="flex-1 mb-3">
-          <ul className="space-y-1.5 text-right">
-            <li className="text-gray-600 text-sm font-medium">{card.description}</li>
-            {visibleBenefits.map((b, i) => (
-              <li key={i} className="flex items-center justify-end gap-2 text-[13px] text-gray-700">
-                <span>{b}</span>
-                <span className="text-green-500 font-bold text-base leading-none shrink-0">✓</span>
-              </li>
-            ))}
-            {/* extra benefits revealed on expand */}
-            {expanded && extraBenefits.map((b, i) => (
+        {/* price */}
+        <p className="text-center text-[#c9a227] font-bold text-sm mb-4">{card.price}</p>
+
+        {/* expandable benefits (عرض المزيد) */}
+        {expanded && (
+          <ul className="space-y-1.5 text-right mb-4 border-t border-gray-100 pt-3">
+            {card.benefits.map((b, i) => (
               <li key={i} className="flex items-center justify-end gap-2 text-[13px] text-gray-700">
                 <span>{b}</span>
                 <span className="text-green-500 font-bold text-base leading-none shrink-0">✓</span>
               </li>
             ))}
           </ul>
+        )}
+
+        <div className="mt-auto">
+          {/* 4 ── order button */}
+          <Link
+            href={`/register?brand=${brand.key}&type=${card.id}`}
+            className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm text-[15px] mb-2"
+          >
+            اطلب الآن
+          </Link>
+
+          {/* 5 ── more link */}
+          <button
+            onClick={() => setExpanded(!expanded)}
+            aria-expanded={expanded}
+            className="w-full flex items-center justify-center gap-1 text-[#c9a227] hover:text-[#b8943f] text-sm font-medium transition-colors cursor-pointer py-1"
+          >
+            {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            <span>{expanded ? 'عرض أقل' : 'عرض المزيد'}</span>
+          </button>
         </div>
-
-        {/* ── Bottom row: icon + price ── */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[#c9a227] font-bold text-sm">{card.price}</span>
-          <div className="text-gray-300">
-            {CARD_ICONS[card.id]}
-          </div>
-        </div>
-
-        {/* ── Actions ── */}
-        <Link
-          href={`/register?brand=${brand.key}&type=${card.id}`}
-          className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm text-[15px] mb-2"
-        >
-          اطلب الآن
-        </Link>
-
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-center gap-1 text-[#c9a227] hover:text-[#b8943f] text-sm font-medium transition-colors cursor-pointer py-1"
-        >
-          {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-          <span>عرض المزيد</span>
-        </button>
       </div>
     </div>
   );
@@ -162,7 +85,7 @@ export default function Cards() {
 
   return (
     <div className="w-full">
-      {/* ── Brand header banner ── */}
+      {/* ── brand header ── */}
       <div
         className="w-full py-6 px-4"
         style={{ background: `linear-gradient(135deg, ${brand.darkColor} 0%, ${brand.color} 100%)` }}
@@ -195,31 +118,23 @@ export default function Cards() {
         </div>
       </div>
 
-      {/* ── Disclaimer ── */}
+      {/* ── disclaimer ── */}
       <div className="max-w-[960px] mx-auto px-4 pt-5">
         <p className="text-[11px] text-gray-400 text-center border border-gray-200 rounded-lg px-4 py-2 bg-gray-50">
           ⚠️ هذا الموقع <strong>ليس الموقع الرسمي</strong> لأي جهة. الصور أمثلة توضيحية فقط ولا تمثل بطاقات رسمية.
         </p>
       </div>
 
-      {/* ── Cards grid ── */}
+      {/* ── cards grid (3 columns like the reference) ── */}
       <div className="max-w-[960px] mx-auto px-4 py-7">
-        <div
-          className={`grid gap-5 ${
-            brand.cards.length === 3
-              ? 'grid-cols-1 sm:grid-cols-3'
-              : brand.cards.length === 4
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-          }`}
-        >
+        <div className="grid gap-5 grid-cols-1 md:grid-cols-3">
           {brand.cards.map(card => (
             <MemberCard key={card.id} brand={brand} card={card} />
           ))}
         </div>
       </div>
 
-      {/* ── Bottom features bar (matches reference image) ── */}
+      {/* ── features bar ── */}
       <div className="bg-white border-t border-gray-100 py-6 px-4">
         <div className="max-w-[960px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-5 text-center">
           {[
@@ -237,14 +152,12 @@ export default function Cards() {
         </div>
       </div>
 
-      {/* ── CTA footer bar (matches reference image) ── */}
+      {/* ── CTA bar ── */}
       <div
         className="py-4 px-4 text-center"
         style={{ background: `linear-gradient(90deg, ${brand.darkColor}, ${brand.color})` }}
       >
-        <p className="text-white font-bold text-base">
-          احصل على بطاقتك الآن وابدأ الاستفادة!
-        </p>
+        <p className="text-white font-bold text-base">احصل على بطاقتك الآن وابدأ الاستفادة!</p>
       </div>
     </div>
   );

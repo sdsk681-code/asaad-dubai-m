@@ -107,7 +107,7 @@ components:
           enum: [fazaa, esaad, homat, alsaada, absher]
         cardType:
           type: string
-          enum: [platinum, gold, silver, discount]
+          enum: [gold, silver, discount]
         region:
           type: string
         streetAddress:

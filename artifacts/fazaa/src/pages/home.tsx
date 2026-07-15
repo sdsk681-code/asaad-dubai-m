@@ -3,8 +3,8 @@ import { Link } from 'wouter';
 import useEmblaCarousel from 'embla-carousel-react';
 import { CheckCircle2 } from 'lucide-react';
 
-import heroBanner from '@assets/fazaa/hero-banner.png';
-import zeroDirhams from '@assets/fazaa/zero-dirhams.png';
+import heroBanner from '@assets/fazaa/hero-banner.webp';
+import zeroDirhams from '@assets/fazaa/zero-dirhams.webp';
 
 import { BRANDS, BRAND_KEYS, type BrandData } from '@/data/brands';
 
@@ -69,10 +69,10 @@ export default function Home() {
         <div className="overflow-hidden h-full" ref={emblaRef}>
           <div className="flex h-full">
             <div className="flex-[0_0_100%] min-w-0 h-full">
-              <img src={heroBanner} alt="عروض فزعة" className="w-full h-full object-cover object-center" />
+              <img src={heroBanner} alt="عروض فزعة" fetchPriority="high" className="w-full h-full object-cover object-center" />
             </div>
             <div className="flex-[0_0_100%] min-w-0 h-full">
-              <img src={zeroDirhams} alt="صفر درهم" className="w-full h-full object-cover object-center" />
+              <img src={zeroDirhams} alt="صفر درهم" loading="lazy" className="w-full h-full object-cover object-center" />
             </div>
           </div>
         </div>
@@ -80,6 +80,25 @@ export default function Home() {
 
       {/* Brands Section */}
       <div className="max-w-[900px] mx-auto px-4 md:px-6 py-10 md:py-14">
+        {/* How it works — 3 steps */}
+        <div className="mb-10 bg-white border border-[#e8e8e8] rounded-xl p-4 md:p-5 shadow-sm">
+          <div className="grid grid-cols-3 gap-2 text-center">
+            {[
+              { n: '١', title: 'اختر الجهة', desc: 'فزعة، إسعاد، وغيرها' },
+              { n: '٢', title: 'اختر نوع البطاقة', desc: 'ذهبية، فضية أو خصومات' },
+              { n: '٣', title: 'سجّل بياناتك', desc: 'ونوصلها حتى باب بيتك' },
+            ].map((s, i) => (
+              <div key={i} className="flex flex-col items-center gap-1.5">
+                <div className="w-9 h-9 rounded-full bg-[#c9a227] text-white font-bold flex items-center justify-center text-lg">
+                  {s.n}
+                </div>
+                <p className="font-bold text-gray-900 text-sm">{s.title}</p>
+                <p className="text-xs text-gray-500 hidden sm:block">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <h2 className="text-3xl font-bold text-gray-900 mb-2 text-right">أشهر بطاقات الخصومات</h2>
         <p className="text-gray-500 text-right mb-8">اختر البطاقة المناسبة لك وابدأ الاستفادة من آلاف العروض والخصومات</p>
 

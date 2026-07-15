@@ -25,7 +25,7 @@ export const CreateRegistrationBody = zod.object({
   "phone": zod.string(),
   "emiratesId": zod.string(),
   "brand": zod.enum(['fazaa', 'esaad', 'homat', 'alsaada', 'absher']),
-  "cardType": zod.enum(['platinum', 'gold', 'silver', 'discount']),
+  "cardType": zod.enum(['gold', 'silver', 'discount']),
   "region": zod.string(),
   "streetAddress": zod.string(),
   "neighborhood": zod.string(),

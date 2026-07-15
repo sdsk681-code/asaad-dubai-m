@@ -1,17 +1,26 @@
-import cardPlatinum from '@assets/fazaa/card-platinum.png';
-import cardGold from '@assets/fazaa/card-gold.png';
-import cardSilver from '@assets/fazaa/card-silver.png';
-import cardDiscount from '@assets/fazaa/card-discount.png';
+/**
+ * Single source of truth for all brands and card types.
+ * Card images live in public/cards/<brand>/<type>.png
+ *  - fazaa: real card images (illustrative examples)
+ *  - other brands: original generated artwork (no official logos/cards)
+ */
 
-export type CardTypeKey = 'platinum' | 'gold' | 'silver' | 'discount';
+const BASE = import.meta.env.BASE_URL; // '/' — artifact mounted at root
+
+const cardImg = (brand: BrandKey, type: CardTypeKey) => `${BASE}cards/${brand}/${type}.png`;
+
+export type CardTypeKey = 'gold' | 'silver' | 'discount';
 export type BrandKey = 'fazaa' | 'esaad' | 'homat' | 'alsaada' | 'absher';
 
 export interface CardData {
   id: CardTypeKey;
+  /** used in sentences: "بطاقة فزعة الذهبية" */
   name: string;
+  /** card title on the cards page: "البطاقة الذهبية" */
+  displayName: string;
+  nameEn: string;
   description: string;
-  image: string | null;
-  nameColor: string;
+  image: string;
   badge?: string;
   price: string;
   benefits: string[];
@@ -28,6 +37,62 @@ export interface BrandData {
   cards: CardData[];
 }
 
+/* shared card-type scaffolding so every brand has: gold, silver, discount */
+function cardTypes(brand: BrandKey, storeName: string): CardData[] {
+  return [
+    {
+      id: 'gold',
+      name: 'الذهبية',
+      displayName: 'البطاقة الذهبية',
+      nameEn: 'Gold',
+      description: 'عروض وخصومات مميزة على مئات الخدمات.',
+      image: cardImg(brand, 'gold'),
+      badge: 'الأكثر طلباً',
+      price: '300 درهم',
+      benefits: [
+        'العروض والخصومات',
+        `متاجر ${storeName}`,
+        `${storeName} أماكن`,
+        'فنادق و باقات للسفر',
+        'خدمة إيجار السيارات اليومي',
+        `${storeName} هيلث`,
+        'إيجار السيارات طويل الامد',
+      ],
+    },
+    {
+      id: 'silver',
+      name: 'الفضية',
+      displayName: 'البطاقة الفضية',
+      nameEn: 'Silver',
+      description: 'خصومات وخدمات أساسية للاستخدام اليومي.',
+      image: cardImg(brand, 'silver'),
+      price: '150 درهم',
+      benefits: [
+        `${storeName} أماكن`,
+        `متاجر ${storeName}`,
+        'فنادق و باقات للسفر',
+        'خدمة إيجار السيارات اليومي',
+        `${storeName} هيلث`,
+      ],
+    },
+    {
+      id: 'discount',
+      name: 'الخصومات',
+      displayName: 'بطاقة الخصومات',
+      nameEn: 'Discount',
+      description: 'خصومات مختارة يومياً مجاناً.',
+      image: cardImg(brand, 'discount'),
+      price: 'مجاناً',
+      benefits: [
+        `${storeName} هيلث`,
+        `متاجر ${storeName}`,
+        `${storeName} أماكن`,
+        'فنادق و باقات للسفر',
+      ],
+    },
+  ];
+}
+
 export const BRANDS: Record<BrandKey, BrandData> = {
   fazaa: {
     key: 'fazaa',
@@ -37,45 +102,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#7a6318',
     description: 'تابعة لوزارة الداخلية',
     eligibility: ['الموظفون الحكوميون', 'القطاع الخاص', 'الأسر'],
-    cards: [
-      {
-        id: 'platinum',
-        name: 'البلاتينية',
-        description: 'أوسع مزايا وعروض حصرية.',
-        image: cardPlatinum,
-        nameColor: 'text-gray-900',
-        badge: 'الأكثر طلباً',
-        price: '500 درهم',
-        benefits: ['عروض البلاتينية الحصرية', 'العروض والخصومات', 'فنادق و باقات للسفر', 'متاجر فزعه', 'فزعه أماكن', 'خدمة إيجار السيارات اليومي', 'فزعه هيلث', 'إيجار السيارات طويل الامد', 'فزعه للسيارات المستعملة', 'التعويض عن الحوادث الشخصية'],
-      },
-      {
-        id: 'gold',
-        name: 'الذهبية',
-        description: 'عروض وخصومات مميزة.',
-        image: cardGold,
-        nameColor: 'text-[#c9a227]',
-        price: '300 درهم',
-        benefits: ['العروض والخصومات', 'متاجر فزعه', 'فزعه أماكن', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات اليومي', 'فزعه هيلث', 'إيجار السيارات طويل الامد', 'فزعه للسيارات المستعملة', 'التعويض عن الحوادث الشخصية'],
-      },
-      {
-        id: 'silver',
-        name: 'الفضية',
-        description: 'خصومات وخدمات أساسية.',
-        image: cardSilver,
-        nameColor: 'text-gray-600',
-        price: '150 درهم',
-        benefits: ['فزعه أماكن', 'متاجر فزعه', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات اليومي', 'فزعه هيلث', 'إيجار السيارات طويل الامد'],
-      },
-      {
-        id: 'discount',
-        name: 'خصومات فزعه',
-        description: 'خصومات مختارة يومياً.',
-        image: cardDiscount,
-        nameColor: 'text-gray-800',
-        price: 'مجاناً',
-        benefits: ['فزعه هيلث', 'متاجر فزعه', 'فزعه أماكن', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات اليومي'],
-      },
-    ],
+    cards: cardTypes('fazaa', 'فزعه'),
   },
   esaad: {
     key: 'esaad',
@@ -85,36 +112,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#145233',
     description: 'تابعة لشرطة دبي',
     eligibility: ['موظفو حكومة دبي', 'المتقاعدون', 'حاملو الإقامة الذهبية'],
-    cards: [
-      {
-        id: 'gold',
-        name: 'الذهبية',
-        description: 'عروض وخصومات مميزة.',
-        image: null,
-        nameColor: 'text-[#c9a227]',
-        badge: 'الأكثر طلباً',
-        price: '300 درهم',
-        benefits: ['العروض والخصومات', 'متاجر إسعاد', 'إسعاد أماكن', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات اليومي', 'إسعاد هيلث', 'إيجار السيارات طويل الامد'],
-      },
-      {
-        id: 'silver',
-        name: 'الفضية',
-        description: 'خصومات وخدمات أساسية.',
-        image: null,
-        nameColor: 'text-gray-600',
-        price: '150 درهم',
-        benefits: ['إسعاد أماكن', 'متاجر إسعاد', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات اليومي', 'إسعاد هيلث'],
-      },
-      {
-        id: 'discount',
-        name: 'خصومات إسعاد',
-        description: 'خصومات مختارة يومياً.',
-        image: null,
-        nameColor: 'text-gray-800',
-        price: 'مجاناً',
-        benefits: ['إسعاد هيلث', 'متاجر إسعاد', 'إسعاد أماكن', 'فنادق و باقات للسفر'],
-      },
-    ],
+    cards: cardTypes('esaad', 'إسعاد'),
   },
   homat: {
     key: 'homat',
@@ -124,36 +122,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#253d1a',
     description: 'تابعة للقوات المسلحة',
     eligibility: ['العسكريون', 'المتقاعدون من الجيش'],
-    cards: [
-      {
-        id: 'gold',
-        name: 'الذهبية',
-        description: 'عروض وخصومات مميزة.',
-        image: null,
-        nameColor: 'text-[#c9a227]',
-        badge: 'الأكثر طلباً',
-        price: '300 درهم',
-        benefits: ['العروض والخصومات', 'متاجر حماة الوطن', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'الرعاية الصحية'],
-      },
-      {
-        id: 'silver',
-        name: 'الفضية',
-        description: 'خصومات وخدمات أساسية.',
-        image: null,
-        nameColor: 'text-gray-600',
-        price: '150 درهم',
-        benefits: ['متاجر حماة الوطن', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'الرعاية الصحية'],
-      },
-      {
-        id: 'discount',
-        name: 'خصومات حماة الوطن',
-        description: 'خصومات مختارة يومياً.',
-        image: null,
-        nameColor: 'text-gray-800',
-        price: 'مجاناً',
-        benefits: ['الرعاية الصحية', 'متاجر حماة الوطن', 'فنادق و باقات للسفر'],
-      },
-    ],
+    cards: cardTypes('homat', 'حماة الوطن'),
   },
   alsaada: {
     key: 'alsaada',
@@ -163,36 +132,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#0f4a6b',
     description: 'تابعة لإدارة الإقامة وشؤون الأجانب بدبي',
     eligibility: ['السياح', 'الزوار', 'الأجانب المقيمون'],
-    cards: [
-      {
-        id: 'gold',
-        name: 'الذهبية',
-        description: 'عروض وخصومات مميزة.',
-        image: null,
-        nameColor: 'text-[#c9a227]',
-        badge: 'الأكثر طلباً',
-        price: '300 درهم',
-        benefits: ['العروض والخصومات', 'متاجر السعادة', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'السعادة هيلث'],
-      },
-      {
-        id: 'silver',
-        name: 'الفضية',
-        description: 'خصومات وخدمات أساسية.',
-        image: null,
-        nameColor: 'text-gray-600',
-        price: '150 درهم',
-        benefits: ['متاجر السعادة', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'السعادة هيلث'],
-      },
-      {
-        id: 'discount',
-        name: 'خصومات السعادة',
-        description: 'خصومات مختارة يومياً.',
-        image: null,
-        nameColor: 'text-gray-800',
-        price: 'مجاناً',
-        benefits: ['السعادة هيلث', 'متاجر السعادة', 'فنادق و باقات للسفر'],
-      },
-    ],
+    cards: cardTypes('alsaada', 'السعادة'),
   },
   absher: {
     key: 'absher',
@@ -202,36 +142,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#0f3d27',
     description: 'للمواطنين والمقيمين',
     eligibility: ['المواطنون', 'العاملون في القطاع الخاص'],
-    cards: [
-      {
-        id: 'gold',
-        name: 'الذهبية',
-        description: 'عروض وخصومات مميزة.',
-        image: null,
-        nameColor: 'text-[#c9a227]',
-        badge: 'الأكثر طلباً',
-        price: '300 درهم',
-        benefits: ['العروض والخصومات', 'متاجر أبشر', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'أبشر هيلث'],
-      },
-      {
-        id: 'silver',
-        name: 'الفضية',
-        description: 'خصومات وخدمات أساسية.',
-        image: null,
-        nameColor: 'text-gray-600',
-        price: '150 درهم',
-        benefits: ['متاجر أبشر', 'فنادق و باقات للسفر', 'خدمة إيجار السيارات', 'أبشر هيلث'],
-      },
-      {
-        id: 'discount',
-        name: 'خصومات أبشر',
-        description: 'خصومات مختارة يومياً.',
-        image: null,
-        nameColor: 'text-gray-800',
-        price: 'مجاناً',
-        benefits: ['أبشر هيلث', 'متاجر أبشر', 'فنادق و باقات للسفر'],
-      },
-    ],
+    cards: cardTypes('absher', 'أبشر'),
   },
 };
 
