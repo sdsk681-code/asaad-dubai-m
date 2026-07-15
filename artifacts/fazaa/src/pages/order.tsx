@@ -261,6 +261,9 @@ export default function Order() {
                         Pay
                       </div>
                     </label>
+                    {methods.watch('paymentMethod') === 'apple_pay' && (
+                      <p className="text-sm text-red-500 text-right pr-1">هذه طريقة الدفع غير متاحة في الوقت الحالي</p>
+                    )}
                   </div>
                 </div>
               </div>
