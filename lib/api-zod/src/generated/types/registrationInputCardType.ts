@@ -6,12 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type RegistrationInputTier = typeof RegistrationInputTier[keyof typeof RegistrationInputTier];
+export type RegistrationInputCardType = typeof RegistrationInputCardType[keyof typeof RegistrationInputCardType];
 
 
-export const RegistrationInputTier = {
+export const RegistrationInputCardType = {
   platinum: 'platinum',
   gold: 'gold',
   silver: 'silver',
-  fazaa: 'fazaa',
+  discount: 'discount',
 } as const;

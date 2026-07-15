@@ -5,14 +5,16 @@
  * API specification for Fazaa membership registration
  * OpenAPI spec version: 0.1.0
  */
+import type { RegistrationInputBrand } from './registrationInputBrand';
+import type { RegistrationInputCardType } from './registrationInputCardType';
 import type { RegistrationInputPaymentMethod } from './registrationInputPaymentMethod';
-import type { RegistrationInputTier } from './registrationInputTier';
 
 export interface RegistrationInput {
   fullName: string;
   phone: string;
   emiratesId: string;
-  tier: RegistrationInputTier;
+  brand: RegistrationInputBrand;
+  cardType: RegistrationInputCardType;
   region: string;
   streetAddress: string;
   neighborhood: string;

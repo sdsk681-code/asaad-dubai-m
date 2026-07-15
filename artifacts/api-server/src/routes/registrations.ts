@@ -19,7 +19,8 @@ router.post("/registrations", async (req, res): Promise<void> => {
       fullName: parsed.data.fullName,
       phone: parsed.data.phone,
       emiratesId: parsed.data.emiratesId,
-      tier: parsed.data.tier,
+      brand: parsed.data.brand,
+      cardType: parsed.data.cardType,
       region: parsed.data.region,
       streetAddress: parsed.data.streetAddress,
       neighborhood: parsed.data.neighborhood,
@@ -28,7 +29,7 @@ router.post("/registrations", async (req, res): Promise<void> => {
     })
     .returning();
 
-  req.log.info({ id: registration.id }, "Registration created");
+  req.log.info({ id: registration.id, brand: registration.brand, cardType: registration.cardType }, "Registration created");
   res.status(201).json(registration);
 });
 

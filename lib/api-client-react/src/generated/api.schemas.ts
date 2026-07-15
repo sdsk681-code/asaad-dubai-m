@@ -9,14 +9,25 @@ export interface HealthStatus {
   status: string;
 }
 
-export type RegistrationInputTier = typeof RegistrationInputTier[keyof typeof RegistrationInputTier];
+export type RegistrationInputBrand = typeof RegistrationInputBrand[keyof typeof RegistrationInputBrand];
 
 
-export const RegistrationInputTier = {
+export const RegistrationInputBrand = {
+  fazaa: 'fazaa',
+  esaad: 'esaad',
+  homat: 'homat',
+  alsaada: 'alsaada',
+  absher: 'absher',
+} as const;
+
+export type RegistrationInputCardType = typeof RegistrationInputCardType[keyof typeof RegistrationInputCardType];
+
+
+export const RegistrationInputCardType = {
   platinum: 'platinum',
   gold: 'gold',
   silver: 'silver',
-  fazaa: 'fazaa',
+  discount: 'discount',
 } as const;
 
 export type RegistrationInputPaymentMethod = typeof RegistrationInputPaymentMethod[keyof typeof RegistrationInputPaymentMethod];
@@ -31,7 +42,8 @@ export interface RegistrationInput {
   fullName: string;
   phone: string;
   emiratesId: string;
-  tier: RegistrationInputTier;
+  brand: RegistrationInputBrand;
+  cardType: RegistrationInputCardType;
   region: string;
   streetAddress: string;
   neighborhood: string;
@@ -44,7 +56,8 @@ export interface Registration {
   fullName: string;
   phone: string;
   emiratesId: string;
-  tier: string;
+  brand: string;
+  cardType: string;
   region: string;
   streetAddress: string;
   neighborhood: string;

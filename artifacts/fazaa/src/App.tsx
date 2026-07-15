@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import Home from './pages/home';
+import Cards from './pages/cards';
 import Order from './pages/order';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -18,6 +19,7 @@ function Router() {
       <main className="flex-1 w-full pb-12">
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/cards" component={Cards} />
           <Route path="/order" component={Order} />
           <Route>
             <div className="p-12 text-center text-xl">الصفحة غير موجودة 404</div>

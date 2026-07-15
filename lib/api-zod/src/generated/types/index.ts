@@ -10,5 +10,6 @@ export * from './errorResponse';
 export * from './healthStatus';
 export * from './registration';
 export * from './registrationInput';
+export * from './registrationInputBrand';
+export * from './registrationInputCardType';
 export * from './registrationInputPaymentMethod';
-export * from './registrationInputTier';

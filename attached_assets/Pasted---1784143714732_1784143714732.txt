@@ -1,0 +1,90 @@
+تمام، هذا بالضبط الذي تقصده. أرسل للمبرمج هذا النص:
+
+⸻
+
+أريد أن تكون صفحة أنواع البطاقات ديناميكية حسب البطاقة التي اختارها الزائر من الصفحة الأولى.
+
+مثال:
+
+* إذا ضغط الزائر على فزعة في الصفحة الأولى، تفتح الصفحة الثانية وتعرض:
+    * بطاقة فزعة الذهبية
+    * بطاقة فزعة الفضية
+    * خصومات فزعة
+* إذا ضغط على إسعاد، نفس الصفحة الثانية تتحول تلقائيًا وتعرض:
+    * بطاقة إسعاد الذهبية
+    * بطاقة إسعاد الفضية
+    * خصومات إسعاد
+* وإذا اختار حماة الوطن أو السعادة أو أبشر، يتغير الشعار والاسم وصور البطاقات والنصوص حسب الاختيار.
+
+مرّر اسم البطاقة في الرابط بهذه الطريقة:
+
+/cards?brand=fazaa
+/cards?brand=esaad
+/cards?brand=homat
+/cards?brand=alsaada
+/cards?brand=absher
+
+داخل صفحة /cards اقرأ قيمة brand، ثم غيّر المحتوى ديناميكيًا من ملف بيانات واحد.
+
+مثال البيانات:
+
+const brands = {
+  fazaa: {
+    name: "فزعة",
+    logo: "/brands/fazaa/logo.png",
+    goldImage: "/brands/fazaa/gold.png",
+    silverImage: "/brands/fazaa/silver.png",
+    discountImage: "/brands/fazaa/discount.png",
+  },
+  esaad: {
+    name: "إسعاد",
+    logo: "/brands/esaad/logo.png",
+    goldImage: "/brands/esaad/gold.png",
+    silverImage: "/brands/esaad/silver.png",
+    discountImage: "/brands/esaad/discount.png",
+  },
+  homat: {
+    name: "حماة الوطن",
+    logo: "/brands/homat/logo.png",
+    goldImage: "/brands/homat/gold.png",
+    silverImage: "/brands/homat/silver.png",
+    discountImage: "/brands/homat/discount.png",
+  },
+  alsaada: {
+    name: "السعادة",
+    logo: "/brands/alsaada/logo.png",
+    goldImage: "/brands/alsaada/gold.png",
+    silverImage: "/brands/alsaada/silver.png",
+    discountImage: "/brands/alsaada/discount.png",
+  },
+  absher: {
+    name: "أبشر",
+    logo: "/brands/absher/logo.png",
+    goldImage: "/brands/absher/gold.png",
+    silverImage: "/brands/absher/silver.png",
+    discountImage: "/brands/absher/discount.png",
+  },
+};
+
+وعند ضغط زر أطلب الآن مرّر اسم البطاقة ونوعها إلى صفحة المعلومات:
+
+/register?brand=fazaa&type=gold
+/register?brand=fazaa&type=silver
+/register?brand=esaad&type=gold
+/register?brand=esaad&type=silver
+
+داخل صفحة التسجيل يظهر مثلًا:
+
+التسجيل في بطاقة فزعة الذهبية
+
+أو:
+
+التسجيل في بطاقة إسعاد الفضية
+
+مهم جدًا:
+
+* لا تعمل صفحة منفصلة لكل شركة.
+* استخدم نفس الصفحة لجميع البطاقات.
+* فقط يتغير الشعار، الاسم، الصور والنصوص حسب اختيار الزائر.
+* لا تغيّر تصميم الصفحة الحالية.
+* احفظ brand وtype مع بيانات الزائر في قاعدة البيانات ولوحة التحكم.

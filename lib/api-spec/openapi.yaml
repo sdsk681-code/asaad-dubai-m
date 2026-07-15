@@ -88,7 +88,8 @@ components:
         - fullName
         - phone
         - emiratesId
-        - tier
+        - brand
+        - cardType
         - region
         - streetAddress
         - neighborhood
@@ -101,9 +102,12 @@ components:
           type: string
         emiratesId:
           type: string
-        tier:
+        brand:
           type: string
-          enum: [platinum, gold, silver, fazaa]
+          enum: [fazaa, esaad, homat, alsaada, absher]
+        cardType:
+          type: string
+          enum: [platinum, gold, silver, discount]
         region:
           type: string
         streetAddress:
@@ -122,7 +126,8 @@ components:
         - fullName
         - phone
         - emiratesId
-        - tier
+        - brand
+        - cardType
         - region
         - streetAddress
         - neighborhood
@@ -139,7 +144,9 @@ components:
           type: string
         emiratesId:
           type: string
-        tier:
+        brand:
+          type: string
+        cardType:
           type: string
         region:
           type: string

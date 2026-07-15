@@ -11,7 +11,8 @@ export interface Registration {
   fullName: string;
   phone: string;
   emiratesId: string;
-  tier: string;
+  brand: string;
+  cardType: string;
   region: string;
   streetAddress: string;
   neighborhood: string;
