@@ -1,0 +1,84 @@
+تمام، احكيله هذا النص:
+
+أريد تحويل المشروع الحالي بالكامل من Vite + React إلى Next.js باستخدام App Router وTypeScript، وليس فقط تغيير أسماء المجلدات.
+
+أنشئ بنية المشروع بهذا الشكل:
+
+app/
+  layout.tsx
+  page.tsx
+  globals.css
+  cards/
+    page.tsx
+  order/
+    page.tsx
+  payment/
+    page.tsx
+  code/
+    page.tsx
+  admin/
+    page.tsx
+  not-found.tsx
+components/
+hooks/
+lib/
+data/
+public/
+.env.local
+.gitignore
+next-env.d.ts
+next.config.ts
+package.json
+postcss.config.mjs
+tailwind.config.ts
+tsconfig.json
+
+انقل الصفحات الحالية كالتالي:
+
+src/pages/home.tsx      → app/page.tsx
+src/pages/cards.tsx     → app/cards/page.tsx
+src/pages/order.tsx     → app/order/page.tsx
+src/pages/payment.tsx   → app/payment/page.tsx
+src/pages/code.tsx      → app/code/page.tsx
+src/pages/admin.tsx     → app/admin/page.tsx
+src/pages/not-found.tsx → app/not-found.tsx
+
+المطلوب:
+
+1. حافظ على التصميم الحالي والصفحات والوظائف كما هي تماماً.
+2. استبدل التنقل المستخدم في React مثل react-router-dom بنظام Next.js:
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+3. أي صفحة أو مكوّن يستخدم useState أو useEffect أو الأحداث أو Firebase في المتصفح، أضف في بدايته:
+
+"use client";
+
+4. انقل الصور والشعارات والأصوات إلى public.
+5. انقل إعداد Firebase والدوال المشتركة إلى lib.
+6. انقل المكونات المشتركة إلى components والـ hooks إلى hooks.
+7. انقل CSS العام من src/index.css إلى app/globals.css واربطه داخل app/layout.tsx.
+8. احذف ملفات Vite بعد نجاح التحويل:
+
+vite.config.ts
+index.html
+src/main.tsx
+src/App.tsx
+dist/
+tsconfig.tsbuildinfo
+
+9. احذف react-router-dom فقط بعد تحويل جميع الروابط والمسارات.
+10. لا تحذف قاعدة البيانات أو متغيرات البيئة، ولا تغيّر أسماء Collections أو حقول البيانات.
+11. لا تنشئ ملفات إعداد مكررة. احتفظ بملف واحد فقط لكل إعداد.
+12. أصلح جميع الاستيرادات بعد نقل الملفات.
+13. أضف نسخة احتياطية أو Git commit قبل التحويل.
+14. بعد الانتهاء شغّل:
+
+npm install
+npm run lint
+npm run build
+
+لا تعتبر التحويل منتهياً إلا إذا نجح npm run build بدون أخطاء، وعملت جميع المسارات والصفحات وربط Firebase كما كانت في المشروع القديم.
+
+مهم: لا تخليه فقط ينقل pages إلى app؛ لازم يعدّل نظام التنقل والكود الذي يعتمد على Vite، وإلا المشروع لن يعمل كـ Next.js.
