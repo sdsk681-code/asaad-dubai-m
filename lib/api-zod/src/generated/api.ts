@@ -51,6 +51,27 @@ export const CreateRegistrationResponse = zod.object({
 
 
 /**
+ * @summary List all registrations (admin)
+ */
+export const ListRegistrationsResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "emiratesId": zod.string(),
+  "brand": zod.string(),
+  "cardType": zod.string(),
+  "region": zod.string(),
+  "streetAddress": zod.string(),
+  "neighborhood": zod.string(),
+  "deliveryDate": zod.string(),
+  "paymentMethod": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string()
+})
+export const ListRegistrationsResponse = zod.array(ListRegistrationsResponseItem)
+
+
+/**
  * @summary Get registration by ID
  */
 export const GetRegistrationParams = zod.object({
@@ -58,6 +79,34 @@ export const GetRegistrationParams = zod.object({
 })
 
 export const GetRegistrationResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "emiratesId": zod.string(),
+  "brand": zod.string(),
+  "cardType": zod.string(),
+  "region": zod.string(),
+  "streetAddress": zod.string(),
+  "neighborhood": zod.string(),
+  "deliveryDate": zod.string(),
+  "paymentMethod": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Approve or reject a registration (admin)
+ */
+export const UpdateRegistrationStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateRegistrationStatusBody = zod.object({
+  "status": zod.enum(['approved', 'rejected'])
+})
+
+export const UpdateRegistrationStatusResponse = zod.object({
   "id": zod.number(),
   "fullName": zod.string(),
   "phone": zod.string(),

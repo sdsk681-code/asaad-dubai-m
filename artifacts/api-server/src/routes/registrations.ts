@@ -1,10 +1,11 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { db, registrationsTable } from "@workspace/db";
 import { CreateRegistrationBody, GetRegistrationParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
+/* POST /registrations — create new */
 router.post("/registrations", async (req, res): Promise<void> => {
   const parsed = CreateRegistrationBody.safeParse(req.body);
   if (!parsed.success) {
@@ -33,6 +34,16 @@ router.post("/registrations", async (req, res): Promise<void> => {
   res.status(201).json(registration);
 });
 
+/* GET /registrations — list all (admin) */
+router.get("/registrations", async (_req, res): Promise<void> => {
+  const rows = await db
+    .select()
+    .from(registrationsTable)
+    .orderBy(desc(registrationsTable.createdAt));
+  res.json(rows);
+});
+
+/* GET /registrations/:id — get single */
 router.get("/registrations/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const parsed = GetRegistrationParams.safeParse({ id: parseInt(raw, 10) });
@@ -52,6 +63,31 @@ router.get("/registrations/:id", async (req, res): Promise<void> => {
   }
 
   res.json(registration);
+});
+
+/* PATCH /registrations/:id/status — approve or reject (admin) */
+router.patch("/registrations/:id/status", async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id, 10);
+  const { status } = req.body as { status: string };
+
+  if (!["approved", "rejected"].includes(status)) {
+    res.status(400).json({ error: "status must be approved or rejected" });
+    return;
+  }
+
+  const [updated] = await db
+    .update(registrationsTable)
+    .set({ status })
+    .where(eq(registrationsTable.id, id))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Registration not found" });
+    return;
+  }
+
+  req.log.info({ id, status }, "Registration status updated");
+  res.json(updated);
 });
 
 export default router;

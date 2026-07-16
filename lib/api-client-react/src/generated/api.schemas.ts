@@ -50,6 +50,18 @@ export interface RegistrationInput {
   paymentMethod: RegistrationInputPaymentMethod;
 }
 
+export type StatusUpdateStatus = typeof StatusUpdateStatus[keyof typeof StatusUpdateStatus];
+
+
+export const StatusUpdateStatus = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface StatusUpdate {
+  status: StatusUpdateStatus;
+}
+
 export interface Registration {
   id: number;
   fullName: string;

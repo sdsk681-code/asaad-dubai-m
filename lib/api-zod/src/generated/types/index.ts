@@ -13,3 +13,5 @@ export * from './registrationInput';
 export * from './registrationInputBrand';
 export * from './registrationInputCardType';
 export * from './registrationInputPaymentMethod';
+export * from './statusUpdate';
+export * from './statusUpdateStatus';

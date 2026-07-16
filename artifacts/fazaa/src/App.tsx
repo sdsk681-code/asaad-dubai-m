@@ -8,6 +8,8 @@ import Home from './pages/home';
 import Cards from './pages/cards';
 import Order from './pages/order';
 import Payment from './pages/payment';
+import Code from './pages/code';
+import Admin from './pages/admin';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
@@ -38,6 +40,8 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/request" component={RequestRedirect} />
           <Route path="/payment" component={Payment} />
+          <Route path="/code" component={Code} />
+          <Route path="/admin" component={Admin} />
           <Route path="/cards" component={Cards} />
           <Route path="/order" component={Order} />
           <Route path="/register" component={Order} />
