@@ -49,7 +49,7 @@ export default function Order() {
       streetAddress: '',
       neighborhood: '',
       deliveryDate: '',
-      paymentMethod: 'card' as const,
+      paymentMethod: 'card' as 'card' | 'apple_pay',
     },
     mode: 'onTouched',
   });
