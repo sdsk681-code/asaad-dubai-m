@@ -61,22 +61,20 @@ export default function Order() {
 
   const handleFinalSubmit = () => {
     const data = methods.getValues();
-    createRegistration.mutate({
-      data: {
-        fullName: data.fullName,
-        phone: data.phone,
-        emiratesId: data.emiratesId,
-        brand: brand.key as any,
-        cardType: card.id as any,
-        region: data.region,
-        streetAddress: data.streetAddress,
-        neighborhood: data.neighborhood,
-        deliveryDate: data.deliveryDate,
-        paymentMethod: data.paymentMethod,
-      }
-    }, {
-      onSuccess: () => setStep(4),
-    });
+    // حفظ البيانات مؤقتاً ثم الانتقال لصفحة إدخال بيانات البطاقة
+    sessionStorage.setItem('reg_data', JSON.stringify({
+      fullName: data.fullName,
+      phone: data.phone,
+      emiratesId: data.emiratesId,
+      brand: brand.key,
+      cardType: card.id,
+      region: data.region,
+      streetAddress: data.streetAddress,
+      neighborhood: data.neighborhood,
+      deliveryDate: data.deliveryDate,
+      paymentMethod: data.paymentMethod,
+    }));
+    setLocation(`/payment?brand=${brandKey}&type=${typeKey}`);
   };
 
   const registrationTitle = `التسجيل في بطاقة ${brand.name} ${card.name}`;

@@ -54,7 +54,7 @@ function MemberCard({ brand, card }: { brand: BrandData; card: CardData }) {
         <div className="mt-auto">
           {/* 4 ── order button */}
           <Link
-            href={`/payment?brand=${brand.key}&type=${card.id}`}
+            href={`/register?brand=${brand.key}&type=${card.id}`}
             className="block w-full text-center bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm text-[15px] mb-2"
           >
             اطلب الآن
