@@ -1,128 +1,58 @@
-import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
-import useEmblaCarousel from 'embla-carousel-react';
-import { CheckCircle2 } from 'lucide-react';
 
-import heroBanner from '@assets/fazaa/hero-banner.webp';
-import zeroDirhams from '@assets/fazaa/zero-dirhams.webp';
+import homePoster from '@assets/fazaa/home-poster.jpeg';
 
-import { BRANDS, BRAND_KEYS, type BrandData } from '@/data/brands';
+/*
+ * الصفحة الأولى = الصورة كما هي، بعرض الصفحة، بدون أي تصميم إضافي.
+ * فوق كل بطاقة داخل الصورة منطقة ضغط شفافة تماماً (position: absolute بنسب مئوية)
+ * تتحرك وتتمدد مع الصورة في جميع أحجام الشاشات.
+ */
 
-function BrandCard({ brand }: { brand: BrandData }) {
-  return (
-    <Link href={`/cards?brand=${brand.key}`}>
-      <div
-        data-testid={`brand-card-${brand.key}`}
-        className="bg-white border border-[#e8e8e8] rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
-            style={{ background: `linear-gradient(135deg, ${brand.darkColor}, ${brand.color})` }}
-          >
-            {brand.nameEn.slice(0, 2)}
-          </div>
-          <div className="text-right">
-            <h3 className="text-xl font-bold text-gray-900">{brand.name}</h3>
-            <p className="text-xs text-gray-400 font-sans">{brand.nameEn}</p>
-          </div>
-        </div>
+type Hotspot = {
+  card: string; // قيمة ?card= في الصفحة الثانية
+  label: string; // للوصولية فقط — غير مرئي
+  top: string;
+  left: string;
+  width: string;
+  height: string;
+};
 
-        <p className="text-sm text-gray-500 text-right mb-3">{brand.description}</p>
-
-        <div className="flex flex-wrap gap-1.5 justify-end mb-4">
-          {brand.eligibility.map((item, i) => (
-            <span
-              key={i}
-              className="text-xs px-2.5 py-1 rounded-full border text-gray-600"
-              style={{ borderColor: brand.color + '55', background: brand.color + '11' }}
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-
-        <div
-          className="w-full text-center text-white text-sm font-bold py-2.5 rounded-lg transition-opacity group-hover:opacity-90"
-          style={{ background: `linear-gradient(135deg, ${brand.darkColor}, ${brand.color})` }}
-        >
-          اختر بطاقتك
-        </div>
-      </div>
-    </Link>
-  );
-}
+const HOTSPOTS: Hotspot[] = [
+  { card: 'fazaa', label: 'بطاقة فزعة', top: '44.1%', left: '1.2%', width: '32.2%', height: '23.1%' },
+  { card: 'esaad', label: 'بطاقة إسعاد', top: '44.1%', left: '34.6%', width: '32%', height: '23.1%' },
+  { card: 'homat-al-watan', label: 'بطاقة حماة الوطن', top: '44.1%', left: '67.5%', width: '31.8%', height: '23.1%' },
+  { card: 'al-saada', label: 'بطاقة السعادة', top: '68.1%', left: '15.8%', width: '32.8%', height: '20.1%' },
+  { card: 'absher', label: 'بطاقة أبشر', top: '68.1%', left: '50.8%', width: '33%', height: '20.1%' },
+];
 
 export default function Home() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, direction: 'rtl' });
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const interval = setInterval(() => emblaApi.scrollNext(), 5000);
-    return () => clearInterval(interval);
-  }, [emblaApi]);
-
   return (
     <div className="w-full">
-      {/* Hero Slider */}
-      <div className="w-full bg-black overflow-hidden h-[200px] md:h-[260px] relative" dir="rtl">
-        <div className="overflow-hidden h-full" ref={emblaRef}>
-          <div className="flex h-full">
-            <div className="flex-[0_0_100%] min-w-0 h-full">
-              <img src={heroBanner} alt="عروض فزعة" fetchPriority="high" className="w-full h-full object-cover object-center" />
-            </div>
-            <div className="flex-[0_0_100%] min-w-0 h-full">
-              <img src={zeroDirhams} alt="صفر درهم" loading="lazy" className="w-full h-full object-cover object-center" />
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="relative w-full max-w-[1024px] mx-auto">
+        <img
+          src={homePoster}
+          alt="أشهر بطاقات الخصومات في الإمارات"
+          fetchPriority="high"
+          className="block w-full h-auto"
+        />
 
-      {/* Brands Section */}
-      <div className="max-w-[900px] mx-auto px-4 md:px-6 py-10 md:py-14">
-        {/* How it works — 3 steps */}
-        <div className="mb-10 bg-white border border-[#e8e8e8] rounded-xl p-4 md:p-5 shadow-sm">
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {[
-              { n: '١', title: 'اختر الجهة', desc: 'فزعة، إسعاد، وغيرها' },
-              { n: '٢', title: 'اختر نوع البطاقة', desc: 'ذهبية، فضية أو خصومات' },
-              { n: '٣', title: 'سجّل بياناتك', desc: 'ونوصلها حتى باب بيتك' },
-            ].map((s, i) => (
-              <div key={i} className="flex flex-col items-center gap-1.5">
-                <div className="w-9 h-9 rounded-full bg-[#c9a227] text-white font-bold flex items-center justify-center text-lg">
-                  {s.n}
-                </div>
-                <p className="font-bold text-gray-900 text-sm">{s.title}</p>
-                <p className="text-xs text-gray-500 hidden sm:block">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <h2 className="text-3xl font-bold text-gray-900 mb-2 text-right">أشهر بطاقات الخصومات</h2>
-        <p className="text-gray-500 text-right mb-8">اختر البطاقة المناسبة لك وابدأ الاستفادة من آلاف العروض والخصومات</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {BRAND_KEYS.map(key => (
-            <BrandCard key={key} brand={BRANDS[key]} />
-          ))}
-        </div>
-
-        {/* Features */}
-        <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { icon: '🏷️', title: 'خصومات حصرية', desc: 'على مئات الخدمات' },
-            { icon: '✅', title: 'سهولة الاستخدام', desc: 'في كل مكان' },
-            { icon: '⭐', title: 'معتمدة وموثوقة', desc: 'من الجهات الرسمية' },
-            { icon: '🤝', title: 'مزايا متعددة', desc: 'تناسب احتياجاتك' },
-          ].map((f, i) => (
-            <div key={i} className="bg-white border border-[#e8e8e8] rounded-xl p-4 text-center shadow-sm">
-              <div className="text-2xl mb-2">{f.icon}</div>
-              <p className="font-bold text-sm text-gray-900">{f.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+        {HOTSPOTS.map(h => (
+          <Link
+            key={h.card}
+            href={`/request?card=${h.card}`}
+            aria-label={h.label}
+            data-testid={`hotspot-${h.card}`}
+            className="absolute block"
+            style={{
+              top: h.top,
+              left: h.left,
+              width: h.width,
+              height: h.height,
+              background: 'transparent',
+              border: 'none',
+            }}
+          />
+        ))}
       </div>
     </div>
   );
