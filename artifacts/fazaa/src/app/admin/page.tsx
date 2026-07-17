@@ -1,8 +1,7 @@
 'use client';
 import React, { useEffect, useState, useCallback } from 'react';
 import { BRANDS, type BrandKey } from '@/data/brands';
-
-const API = '/api';
+import { supabase } from '@/lib/supabase';
 
 type Reg = {
   id: number;
@@ -30,11 +29,7 @@ const CARD_NAMES: Record<string, string> = {
 };
 
 async function patchStatus(id: number, status: 'approved' | 'rejected') {
-  await fetch(`${API}/registrations/${id}/status`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
+  await supabase.from('registrations').update({ status }).eq('id', id);
 }
 
 export default function Admin() {
@@ -44,12 +39,24 @@ export default function Admin() {
   const [filter, setFilter]   = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
 
   const fetchAll = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/registrations`);
-      if (res.ok) setRows(await res.json());
-    } finally {
-      setLoading(false);
+    const { data } = await supabase
+      .from('registrations')
+      .select('id, full_name, phone, emirates_id, brand, card_type, region, status, created_at')
+      .order('created_at', { ascending: false });
+    if (data) {
+      setRows(data.map((r: any) => ({
+        id:        r.id,
+        fullName:  r.full_name,
+        phone:     r.phone,
+        emiratesId: r.emirates_id,
+        brand:     r.brand,
+        cardType:  r.card_type,
+        region:    r.region,
+        status:    r.status,
+        createdAt: r.created_at,
+      })));
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
