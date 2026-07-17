@@ -3,8 +3,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLang } from '@/context/LanguageContext';
 import { t } from '@/i18n';
-
-const API = '/api';
+import { getRegistration } from '@/lib/supabase';
 
 function genCode(id: number) {
   return String(id * 7919 + 13337).padStart(8, '0').slice(-8).toUpperCase();
@@ -21,9 +20,8 @@ function CodeContent() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`${API}/registrations/${id}`)
-      .then(r => r.json())
-      .then(setReg)
+    getRegistration(id)
+      .then(data => { if (data) setReg(data as any); })
       .catch(() => {});
   }, [id]);
 

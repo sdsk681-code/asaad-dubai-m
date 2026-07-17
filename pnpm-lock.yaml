@@ -57,9 +57,6 @@ catalogs:
     tailwindcss:
       specifier: ^4.1.14
       version: 4.3.2
-    tsx:
-      specifier: ^4.21.0
-      version: 4.23.0
     vite:
       specifier: ^7.3.2
       version: 7.3.6
@@ -221,6 +218,10 @@ importers:
         version: 3.1.0
 
   artifacts/fazaa:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.110.7
+        version: 2.110.7
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0

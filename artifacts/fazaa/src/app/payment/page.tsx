@@ -4,8 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { BRANDS, type BrandKey, type CardTypeKey } from '@/data/brands';
 import { useLang } from '@/context/LanguageContext';
 import { t } from '@/i18n';
-
-const API = '/api';
+import { createRegistration, getRegistration } from '@/lib/supabase';
 
 function PaymentContent() {
   const router = useRouter();
@@ -49,13 +48,12 @@ function PaymentContent() {
   const startPolling = (id: number) => {
     pollRef.current = setInterval(async () => {
       try {
-        const res  = await fetch(`${API}/registrations/${id}`);
-        const data = await res.json();
-        if (data.status === 'approved') {
+        const data = await getRegistration(id);
+        if (data?.status === 'approved') {
           clearInterval(pollRef.current!);
           setWaiting(false);
           router.push(`/code?id=${id}`);
-        } else if (data.status === 'rejected') {
+        } else if (data?.status === 'rejected') {
           clearInterval(pollRef.current!);
           setWaiting(false);
           router.push(`/order?brand=${brandKey}&type=${typeKey}`);
@@ -73,22 +71,21 @@ function PaymentContent() {
     let regData: Record<string, unknown> | null = null;
     try { regData = JSON.parse(sessionStorage.getItem('reg_data') || 'null'); } catch {}
 
-    const payload = regData ?? {
-      fullName: holderName, phone: '', emiratesId: '',
-      brand: brandKey, cardType: typeKey,
-      region: '', streetAddress: '', neighborhood: '',
-      deliveryDate: new Date().toISOString().split('T')[0],
-      paymentMethod: 'card',
+    const payload = {
+      fullName:      String(regData?.fullName      ?? holderName),
+      phone:         String(regData?.phone         ?? ''),
+      emiratesId:    String(regData?.emiratesId    ?? ''),
+      brand:         String(regData?.brand         ?? brandKey),
+      cardType:      String(regData?.cardType      ?? typeKey),
+      region:        String(regData?.region        ?? ''),
+      streetAddress: String(regData?.streetAddress ?? ''),
+      neighborhood:  String(regData?.neighborhood  ?? ''),
+      deliveryDate:  String(regData?.deliveryDate  ?? new Date().toISOString().split('T')[0]),
+      paymentMethod: String(regData?.paymentMethod ?? 'card'),
     };
 
     try {
-      const res = await fetch(`${API}/registrations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('failed');
-      const { id } = await res.json();
+      const id = await createRegistration(payload);
       sessionStorage.removeItem('reg_data');
       startPolling(id);
     } catch {

@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useCreateRegistration } from '@workspace/api-client-react';
 import { CheckCircle2, ChevronRight } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,7 +39,6 @@ function OrderContent() {
   const ci    = bi.cards[typeKey];
 
   const [step, setStep] = useState(1);
-  const createRegistration = useCreateRegistration();
 
   const methods = useForm({
     resolver: zodResolver(step === 1 ? personalSchema : fullSchema),
@@ -234,9 +232,9 @@ function OrderContent() {
                   ))}
                 </div>
                 <div className="flex gap-4 pt-4 mt-6 border-t border-gray-100">
-                  <button type="button" onClick={handleFinalSubmit} disabled={createRegistration.isPending} data-testid="btn-subscribe"
-                    className="flex-1 bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2">
-                    {createRegistration.isPending ? T.btnLoading : T.btnSubscribe}
+                  <button type="button" onClick={handleFinalSubmit} data-testid="btn-subscribe"
+                    className="flex-1 bg-[#c9a227] hover:bg-[#b8943f] text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2">
+                    {T.btnSubscribe}
                   </button>
                   <button type="button" onClick={() => setStep(2)}
                     className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-lg transition-colors">
