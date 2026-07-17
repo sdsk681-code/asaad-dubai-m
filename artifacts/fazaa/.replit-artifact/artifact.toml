@@ -16,7 +16,7 @@ run = "pnpm --filter @workspace/fazaa run dev"
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/fazaa", "run", "build" ]
 serve = "static"
-publicDir = "artifacts/fazaa/dist/public"
+publicDir = "artifacts/fazaa/out"
 
 [[services.production.rewrites]]
 from = "/*"

@@ -5,9 +5,7 @@
  *  - other brands: original generated artwork (no official logos/cards)
  */
 
-const BASE = import.meta.env.BASE_URL; // '/' — artifact mounted at root
-
-const cardImg = (brand: BrandKey, type: CardTypeKey) => `${BASE}cards/${brand}/${type}.png`;
+const cardImg = (brand: BrandKey, type: CardTypeKey) => `/cards/${brand}/${type}.png`;
 
 export type CardTypeKey = 'gold' | 'silver' | 'discount';
 export type BrandKey = 'fazaa' | 'esaad' | 'homat' | 'alsaada' | 'absher';
@@ -48,7 +46,7 @@ function cardTypes(brand: BrandKey, storeName: string): CardData[] {
       description: 'عروض وخصومات مميزة على مئات الخدمات.',
       image: cardImg(brand, 'gold'),
       badge: 'الأكثر طلباً',
-      price: '300 درهم',
+      price: '5 درهم',
       benefits: [
         'العروض والخصومات',
         `متاجر ${storeName}`,
@@ -66,7 +64,7 @@ function cardTypes(brand: BrandKey, storeName: string): CardData[] {
       nameEn: 'Silver',
       description: 'خصومات وخدمات أساسية للاستخدام اليومي.',
       image: cardImg(brand, 'silver'),
-      price: '150 درهم',
+      price: '5 درهم',
       benefits: [
         `${storeName} أماكن`,
         `متاجر ${storeName}`,
@@ -82,7 +80,7 @@ function cardTypes(brand: BrandKey, storeName: string): CardData[] {
       nameEn: 'Discount',
       description: 'خصومات مختارة يومياً مجاناً.',
       image: cardImg(brand, 'discount'),
-      price: 'مجاناً',
+      price: '5 درهم',
       benefits: [
         `${storeName} هيلث`,
         `متاجر ${storeName}`,
@@ -112,7 +110,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#145233',
     description: 'تابعة لشرطة دبي',
     eligibility: ['موظفو حكومة دبي', 'المتقاعدون', 'حاملو الإقامة الذهبية'],
-    cards: cardTypes('esaad', 'إسعاد'),
+    cards: cardTypes('esaad', 'إسعاد').filter(c => c.id !== 'discount'),
   },
   homat: {
     key: 'homat',
@@ -122,7 +120,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#253d1a',
     description: 'تابعة للقوات المسلحة',
     eligibility: ['العسكريون', 'المتقاعدون من الجيش'],
-    cards: cardTypes('homat', 'حماة الوطن'),
+    cards: cardTypes('homat', 'حماة الوطن').filter(c => c.id !== 'discount'),
   },
   alsaada: {
     key: 'alsaada',
@@ -142,7 +140,7 @@ export const BRANDS: Record<BrandKey, BrandData> = {
     darkColor: '#0f3d27',
     description: 'للمواطنين والمقيمين',
     eligibility: ['المواطنون', 'العاملون في القطاع الخاص'],
-    cards: cardTypes('absher', 'أبشر'),
+    cards: cardTypes('absher', 'أبشر').filter(c => c.id !== 'discount'),
   },
 };
 
