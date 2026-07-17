@@ -5,9 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  ...(process.env.NODE_ENV === 'development' && {
-    allowedDevOrigins: ['*.replit.dev', '*.sisko.replit.dev'],
-  }),
+  allowedDevOrigins: ['*.replit.dev', '*.sisko.replit.dev', '127.0.0.1'],
 };
 
 export default nextConfig;

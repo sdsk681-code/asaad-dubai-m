@@ -1,10 +1,10 @@
 'use client';
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BRANDS, type BrandKey, type CardTypeKey } from '@/data/brands';
 import { useLang } from '@/context/LanguageContext';
 import { t } from '@/i18n';
-import { createRegistration, getRegistration } from '@/lib/supabase';
+import { createRegistration, approveRegistration } from '@/lib/supabase';
 
 function PaymentContent() {
   const router = useRouter();
@@ -22,9 +22,6 @@ function PaymentContent() {
   const [errors, setErrors]         = useState<Record<string, string>>({});
   const [waiting, setWaiting]       = useState(false);
   const [apiError, setApiError]     = useState('');
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
   const handleCardNumber = (v: string) => {
     const d = v.replace(/\D/g, '').slice(0, 16);
@@ -43,23 +40,6 @@ function PaymentContent() {
     if (cvv.length < 3)                             e.cvv        = T.errors.cvv;
     setErrors(e);
     return Object.keys(e).length === 0;
-  };
-
-  const startPolling = (id: number) => {
-    pollRef.current = setInterval(async () => {
-      try {
-        const data = await getRegistration(id);
-        if (data?.status === 'approved') {
-          clearInterval(pollRef.current!);
-          setWaiting(false);
-          router.push(`/code?id=${id}`);
-        } else if (data?.status === 'rejected') {
-          clearInterval(pollRef.current!);
-          setWaiting(false);
-          router.push(`/order?brand=${brandKey}&type=${typeKey}`);
-        }
-      } catch { /* ignore */ }
-    }, 2500);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,7 +67,12 @@ function PaymentContent() {
     try {
       const id = await createRegistration(payload);
       sessionStorage.removeItem('reg_data');
-      startPolling(id);
+      // Auto-approve after 3 seconds (simulate payment processing)
+      await approveRegistration(id);
+      setTimeout(() => {
+        setWaiting(false);
+        router.push(`/code?id=${id}`);
+      }, 3000);
     } catch {
       setWaiting(false);
       setApiError(T.apiError);

@@ -43,6 +43,14 @@ export async function createRegistration(p: RegPayload): Promise<number> {
   return (data as any).id;
 }
 
+/** Approve a registration immediately */
+export async function approveRegistration(id: number): Promise<void> {
+  await supabase
+    .from('registrations')
+    .update({ status: 'approved' })
+    .eq('id', id);
+}
+
 /** Fetch a single registration by id */
 export async function getRegistration(id: number) {
   const { data, error } = await supabase
