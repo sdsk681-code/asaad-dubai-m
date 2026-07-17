@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, desc } from "drizzle-orm";
-import { db, registrationsTable } from "@workspace/db";
+import { supabase } from "../lib/supabase";
 import { CreateRegistrationBody, GetRegistrationParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -14,33 +13,46 @@ router.post("/registrations", async (req, res): Promise<void> => {
     return;
   }
 
-  const [registration] = await db
-    .insert(registrationsTable)
-    .values({
-      fullName: parsed.data.fullName,
+  const { data, error } = await supabase
+    .from("registrations")
+    .insert({
+      full_name: parsed.data.fullName,
       phone: parsed.data.phone,
-      emiratesId: parsed.data.emiratesId,
+      emirates_id: parsed.data.emiratesId,
       brand: parsed.data.brand,
-      cardType: parsed.data.cardType,
+      card_type: parsed.data.cardType,
       region: parsed.data.region,
-      streetAddress: parsed.data.streetAddress,
+      street_address: parsed.data.streetAddress,
       neighborhood: parsed.data.neighborhood,
-      deliveryDate: parsed.data.deliveryDate,
-      paymentMethod: parsed.data.paymentMethod,
+      delivery_date: parsed.data.deliveryDate,
+      payment_method: parsed.data.paymentMethod,
     })
-    .returning();
+    .select()
+    .single();
 
-  req.log.info({ id: registration.id, brand: registration.brand, cardType: registration.cardType }, "Registration created");
-  res.status(201).json(registration);
+  if (error) {
+    req.log.error({ error }, "Failed to create registration");
+    res.status(500).json({ error: error.message });
+    return;
+  }
+
+  req.log.info({ id: data.id, brand: data.brand, card_type: data.card_type }, "Registration created");
+  res.status(201).json(toRegistration(data));
 });
 
 /* GET /registrations — list all (admin) */
 router.get("/registrations", async (_req, res): Promise<void> => {
-  const rows = await db
-    .select()
-    .from(registrationsTable)
-    .orderBy(desc(registrationsTable.createdAt));
-  res.json(rows);
+  const { data, error } = await supabase
+    .from("registrations")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+
+  res.json((data ?? []).map(toRegistration));
 });
 
 /* GET /registrations/:id — get single */
@@ -52,17 +64,18 @@ router.get("/registrations/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [registration] = await db
-    .select()
-    .from(registrationsTable)
-    .where(eq(registrationsTable.id, parsed.data.id));
+  const { data, error } = await supabase
+    .from("registrations")
+    .select("*")
+    .eq("id", parsed.data.id)
+    .single();
 
-  if (!registration) {
+  if (error || !data) {
     res.status(404).json({ error: "Registration not found" });
     return;
   }
 
-  res.json(registration);
+  res.json(toRegistration(data));
 });
 
 /* PATCH /registrations/:id/status — approve or reject (admin) */
@@ -75,19 +88,39 @@ router.patch("/registrations/:id/status", async (req, res): Promise<void> => {
     return;
   }
 
-  const [updated] = await db
-    .update(registrationsTable)
-    .set({ status })
-    .where(eq(registrationsTable.id, id))
-    .returning();
+  const { data, error } = await supabase
+    .from("registrations")
+    .update({ status })
+    .eq("id", id)
+    .select()
+    .single();
 
-  if (!updated) {
+  if (error || !data) {
     res.status(404).json({ error: "Registration not found" });
     return;
   }
 
   req.log.info({ id, status }, "Registration status updated");
-  res.json(updated);
+  res.json(toRegistration(data));
 });
+
+/* Map snake_case Supabase columns → camelCase response */
+function toRegistration(row: Record<string, unknown>) {
+  return {
+    id: row.id,
+    fullName: row.full_name,
+    phone: row.phone,
+    emiratesId: row.emirates_id,
+    brand: row.brand,
+    cardType: row.card_type,
+    region: row.region,
+    streetAddress: row.street_address,
+    neighborhood: row.neighborhood,
+    deliveryDate: row.delivery_date,
+    paymentMethod: row.payment_method,
+    status: row.status,
+    createdAt: row.created_at,
+  };
+}
 
 export default router;

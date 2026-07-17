@@ -21,3 +21,11 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_FC2Gw6SoRjnZmxO5jU2Grg_mlbUpHeY"
+NEXT_PUBLIC_SUPABASE_URL = "https://xmmwytmljbszzsluvqiu.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_FC2Gw6SoRjnZmxO5jU2Grg_mlbUpHeY"
+SUPABASE_URL = "https://xmmwytmljbszzsluvqiu.supabase.co"
