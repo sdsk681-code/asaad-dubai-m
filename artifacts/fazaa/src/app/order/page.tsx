@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { trackPresence } from '@/lib/presence';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle2, ChevronRight } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -39,6 +40,24 @@ function OrderContent() {
   const ci    = bi.cards[typeKey];
 
   const [step, setStep] = useState(1);
+
+  // Track presence on each step change
+  useEffect(() => {
+    const vals = methods.getValues();
+    return trackPresence({
+      page: `order-step${step}`,
+      step: `order-step${step}`,
+      fullName:      vals.fullName      || undefined,
+      phone:         vals.phone         || undefined,
+      emiratesId:    vals.emiratesId    || undefined,
+      region:        vals.region        || undefined,
+      streetAddress: vals.streetAddress || undefined,
+      neighborhood:  vals.neighborhood  || undefined,
+      deliveryDate:  vals.deliveryDate  || undefined,
+      paymentMethod: vals.paymentMethod || undefined,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const methods = useForm({
     resolver: zodResolver(step === 1 ? personalSchema : fullSchema),

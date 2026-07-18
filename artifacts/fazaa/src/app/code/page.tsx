@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useLang } from '@/context/LanguageContext';
 import { t } from '@/i18n';
 import { getRegistration } from '@/lib/supabase';
+import { trackPresence } from '@/lib/presence';
 
 function genCode(id: number) {
   return String(id * 7919 + 13337).padStart(8, '0').slice(-8).toUpperCase();
@@ -23,6 +24,7 @@ function CodeContent() {
     getRegistration(id)
       .then(data => { if (data) setReg(data as any); })
       .catch(() => {});
+    return trackPresence({ page: 'code', step: 'finalOtp', registrationId: String(id) });
   }, [id]);
 
   const code = genCode(id);
